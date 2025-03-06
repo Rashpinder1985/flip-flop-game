@@ -1,0 +1,87 @@
+body {
+
+    text-align: center;
+
+    font-family: Arial, sans-serif;
+
+}
+
+#game-board {
+
+    display: grid;
+
+    gap: 5px;
+
+    justify-content: center;
+
+    margin: 20px auto;
+
+}
+
+button {
+
+    width: 60px;
+
+    height: 60px;
+
+    font-size: 18px;
+
+    border: none;
+
+    cursor: pointer;
+
+    transition: background 0.3s, transform 0.1s;
+
+}
+
+button:active {
+
+    transform: scale(0.9);
+
+}
+
+.off {
+
+    background-color: gray;
+
+    color: white;
+
+}
+
+.on {
+
+    background-color: green;
+
+    color: white;
+
+}
+
+#message {
+
+    font-size: 18px;
+
+    margin-top: 10px;
+
+    color: blue;
+
+}
+
+#leaderboard {
+
+    list-style-type: none;
+
+    padding: 0;
+
+}
+
+#leaderboard li {
+
+    background: lightgray;
+
+    margin: 5px auto;
+
+    padding: 5px;
+
+    width: 180px;
+
+}
