@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Flip-Flop Switch Puzzle</title>
+
+    <link rel="stylesheet" href="style.css">
+
+</head>
+
+<body>
+
+    <h1>Flip-Flop Switch Puzzle</h1>
+
+    <p>Turn all switches ON to win!</p>
+
+    
+
+    <label for="difficulty">Difficulty:</label>
+
+    <select id="difficulty" onchange="changeDifficulty()">
+
+        <option value="3">Easy (3x3)</option>
+
+        <option value="4">Medium (4x4)</option>
+
+        <option value="5">Hard (5x5)</option>
+
+    </select>
+
+    <div id="game-board"></div>
+
+    <p>Moves: <span id="move-counter">0</span></p>
+
+    <p>Time: <span id="timer">0</span> sec</p>
+
+    <button onclick="resetGame()">Reset Game</button>
+
+    
+
+    <p id="message"></p>
+
+    <h2>Leaderboard</h2>
+
+    <ol id="leaderboard"></ol>
+
+    <audio id="click-sound" src="click.mp3"></audio>
+
+    <audio id="win-sound" src="win.mp3"></audio>
+
+    <script src="script.js"></script>
+
+</body>
+
+</html>
