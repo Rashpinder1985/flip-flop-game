@@ -1,4 +1,4 @@
-let size = 3; // Default grid size
+let size = 3; 
 
 let board = [];
 
@@ -7,6 +7,9 @@ let moves = 0;
 let timer = 0;
 
 let timerInterval = null;
+
+let hintCount = 0;
+const maxHints = 3;
 
 function createBoard() {
 
@@ -56,6 +59,51 @@ function createBoard() {
 
 }
 
+function getHint(clickCount) {
+    let hint = "";
+    const allSwitches = Array.from(document.querySelectorAll('#game-board button'));
+    const onSwitches = allSwitches.filter(btn => btn.classList.contains('on')).length;
+    
+    if (size === 3) {
+        switch(clickCount) {
+            case 1:
+                hint = "💡 Start with corners: Try clicking any corner switch first. Notice how it affects adjacent switches.";
+                break;
+            case 2:
+                hint = `💡 Progress: ${onSwitches} switches are green. Try to create a pattern - sometimes making some switches gray temporarily is necessary!`;
+                break;
+            case 3:
+                hint = "💡 Strategy: The center switch affects all four adjacent switches, while corner switches only affect two neighbors. Use this to your advantage!";
+                break;
+        }
+    } else if (size === 4) {
+        switch(clickCount) {
+            case 1:
+                hint = "💡 4x4 Strategy: Start by focusing on the outer edges. The corners are good starting points!";
+                break;
+            case 2:
+                hint = `💡 Current Status: ${onSwitches} green lights! Remember that symmetrical patterns often lead to success. Try working in pairs of switches.`;
+                break;
+            case 3:
+                hint = "💡 Advanced Tip: Sometimes you need to create temporary patterns. Don't worry if some switches turn gray - it might be part of the solution!";
+                break;
+        }
+    } else if (size === 5) {
+        switch(clickCount) {
+            case 1:
+                hint = "💡 5x5 Tips: The center switch is crucial! It affects four adjacent switches and can be key to solving the puzzle.";
+                break;
+            case 2:
+                hint = `💡 Building Progress: ${onSwitches} switches are green. Try creating a cross or X pattern - these patterns often help in larger grids!`;
+                break;
+            case 3:
+                hint = "💡 Master Strategy: Think of the grid in sections - solve one area at a time. The corners and edges can be used to fix the middle section.";
+                break;
+        }
+    }
+    return hint;
+}
+
 function toggleSwitch(event) {
 
     let row = parseInt(event.target.dataset.row);
@@ -90,6 +138,11 @@ function toggleSwitch(event) {
 
     document.getElementById("move-counter").textContent = moves;
 
+    if (moves <= maxHints) {
+        const hint = getHint(moves);
+        showHint(hint);
+    }
+
     checkWin();
 
 }
@@ -113,11 +166,11 @@ function checkWin() {
 }
 
 function resetGame() {
-
     createBoard();
-
     document.getElementById("message").textContent = "";
-
+    document.getElementById("hint-container").innerHTML = "";
+    moves = 0;
+    updateLeaderboard();
 }
 
 function startTimer() {
@@ -136,49 +189,71 @@ function changeDifficulty() {
 
     size = parseInt(document.getElementById("difficulty").value);
 
+    document.getElementById("hint-text").textContent = "";
+
     resetGame();
-
-}
-
-// Leaderboard Functions
-
-function saveScore(moves, time) {
-
-    let scores = JSON.parse(localStorage.getItem("leaderboard")) || [];
-
-    scores.push({ moves, time });
-
-    scores.sort((a, b) => a.moves - b.moves || a.time - b.time);
-
-    scores = scores.slice(0, 5); // Keep top 5 scores
-
-    localStorage.setItem("leaderboard", JSON.stringify(scores));
 
     updateLeaderboard();
 
 }
 
-function updateLeaderboard() {
+function saveScore(moves, time) {
+    let playerName = document.getElementById("player-name").value.trim();
+    if (!playerName) {
+        playerName = "Anonymous";
+    }
 
-    let scores = JSON.parse(localStorage.getItem("leaderboard")) || [];
-
-    let leaderboard = document.getElementById("leaderboard");
-
-    leaderboard.innerHTML = "";
-
-    scores.forEach(score => {
-
-        let li = document.createElement("li");
-
-        li.textContent = `${score.moves} moves - ${score.time} sec`;
-
-        leaderboard.appendChild(li);
-
-    });
-
+    const difficultyKey = `leaderboard_${size}x${size}`;
+    let scores = JSON.parse(sessionStorage.getItem(difficultyKey)) || [];
+    scores.push({ name: playerName, moves, time });
+    scores.sort((a, b) => a.moves - b.moves || a.time - b.time);
+    scores = scores.slice(0, 5);
+    sessionStorage.setItem(difficultyKey, JSON.stringify(scores));
+    updateLeaderboard();
 }
 
-// Initialize game
+function updateLeaderboard() {
+    const difficultyKey = `leaderboard_${size}x${size}`;
+    let scores = JSON.parse(sessionStorage.getItem(difficultyKey)) || [];
+    let leaderboard = document.getElementById("leaderboard");
+    leaderboard.innerHTML = `<h3>${size}x${size} Leaderboard</h3>`;
+
+    if (scores.length === 0) {
+        leaderboard.innerHTML += "<p>No scores yet for this difficulty!</p>";
+        return;
+    }
+
+    scores.forEach((score, index) => {
+        let li = document.createElement("li");
+        li.innerHTML = `
+            <span class="score-name">${index + 1}. ${score.name}</span>
+            <span>${score.moves} moves - ${score.time} sec</span>
+        `;
+        leaderboard.appendChild(li);
+    });
+}
+
+function showHint(hint) {
+    const hintContainer = document.getElementById("hint-container");
+    const currentHint = document.createElement("div");
+    currentHint.className = "hint-message";
+    currentHint.innerHTML = hint;
+
+    const closeBtn = document.createElement("button");
+    closeBtn.innerHTML = "×";
+    closeBtn.className = "hint-close";
+    closeBtn.onclick = function() {
+        currentHint.remove();
+    };
+    currentHint.appendChild(closeBtn);
+
+    hintContainer.insertBefore(currentHint, hintContainer.firstChild);
+
+    const hints = hintContainer.getElementsByClassName("hint-message");
+    if (hints.length > 3) {
+        hintContainer.removeChild(hintContainer.lastChild);
+    }
+}
 
 createBoard();
 
